@@ -1,0 +1,156 @@
+
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="Author" content="Студент 241-А">
+<meta name="Description" content="Власна бібліотека медіа. Лабораторна №9">
+<meta name="Keywords" content="audio, video, HTML5 library">
+<title>Моя медіа-бібліотека</title>
+
+<style>
+body {
+    font-family: Arial;
+    background: #eef9ff;
+    padding: 20px;
+}
+h2, h3 {
+    color: #004a80;
+}
+.block {
+    padding: 15px;
+    background: #ffffff;
+    border-left: 4px solid #007acc;
+    margin-bottom: 25px;
+}
+select {
+    padding: 5px 10px;
+}
+</style>
+
+<script>
+const audioFiles = [
+    "track1.mp3",
+    "track2.mp3",
+    "track3.mp3"
+];
+
+const videoFiles = [
+    "video1.mp4",
+    "video2.mp4",
+    "video3.webm"
+];
+
+function loadAudioList() {
+    const select = document.getElementById("audioSelect");
+    select.innerHTML = "";
+
+    audioFiles.forEach((file, index) => {
+        const option = document.createElement("option");
+        option.value = file;
+        option.textContent = file;
+        if (index === 0) option.selected = true;
+        select.appendChild(option);
+    });
+
+    document.getElementById("audioPlayer").src = "audio/" + audioFiles[0];
+}
+
+function loadVideoList() {
+    const select = document.getElementById("videoSelect");
+    select.innerHTML = "";
+
+    videoFiles.forEach((file, index) => {
+        const option = document.createElement("option");
+        option.value = file;
+        option.textContent = file;
+        if (index === 0) option.selected = true;
+        select.appendChild(option);
+    });
+
+    document.getElementById("videoPlayer").src = "video/" + videoFiles[0];
+}
+
+function setAudio() {
+    let audio = document.getElementById("audioPlayer");
+    audio.src = "audio/" + audioSelect.value;
+    audio.play();
+}
+function setVideo() {
+    let video = document.getElementById("videoPlayer");
+    video.src = "video/" + videoSelect.value;
+    video.play();
+}
+
+function checkVideo() {
+    let result = document.getElementById("checkVideoResult");
+    let test = document.createElement("video");
+
+    if (!test.canPlayType) {
+        result.textContent = "Ваш браузер НЕ підтримує відео!";
+        return;
+    }
+
+    let mp4 = test.canPlayType('video/mp4');
+    let webm = test.canPlayType('video/webm');
+
+    if (mp4 === "probably") result.textContent = "Підтримує MP4 ✔";
+    else if (webm === "probably") result.textContent = "Підтримує WEBM ✔";
+    else result.textContent = "Підтримка часткова або відсутня ❌";
+}
+
+window.onload = function() {
+    loadAudioList();
+    loadVideoList();
+};
+</script>
+
+</head>
+
+<body>
+
+<h2>Лабораторна робота №9. Власна мультимедійна бібліотека</h2>
+<div class="block">
+    <h3>🎧 Меню аудіобібліотеки</h3>
+
+    <form>
+        <label for="audioSelect">Оберіть аудіофайл:</label><br><br>
+        <select id="audioSelect" name="audio-menu" onchange="setAudio()"></select>
+    </form>
+
+    <br>
+
+    <audio id="audioPlayer" controls>
+        Ваш браузер не підтримує аудіо.
+    </audio>
+</div>
+
+<hr>
+<div class="block">
+    <h3>🎬 Меню відеобібліотеки</h3>
+
+    <form>
+        <label for="videoSelect">Оберіть відеофайл:</label><br><br>
+        <select id="videoSelect" name="video-menu" onchange="setVideo()"></select>
+    </form>
+
+    <br>
+
+    <video id="videoPlayer" width="420" controls>
+        Відео не підтримується вашим браузером.
+    </video>
+</div>
+
+<hr>
+
+
+<div class="block">
+    <h3>Перевірка підтримки відео вашим браузером</h3>
+
+    <button onclick="checkVideo()">Перевірити</button>
+
+    <p id="checkVideoResult" style="font-weight: bold; color:#003366; margin-top:10px;"></p>
+</div>
+
+</body>
+</html>
