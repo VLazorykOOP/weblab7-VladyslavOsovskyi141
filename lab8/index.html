@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<title>Лабораторна №8 — Canvas події + зупинка</title>
+
+<style>
+    body { background: #f0f0f0; text-align: center; font-family: Arial; }
+    canvas { background: white; border: 2px dashed black; margin-top: 20px; }
+</style>
+
+</head>
+<body>
+
+<h2>Лабораторна робота №8 — Події по кліку</h2>
+<canvas id="canvas" width="700" height="500"></canvas>
+
+<script>
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+
+
+let animations = {
+    sq1: false,
+    sq2: false,
+    sq3: false, 
+    sq4: false, 
+    circleLeft: false,
+    circleRight: false,
+    bigOval: false
+};
+
+let animState = {
+    sq1Shift: 0,
+    sq2Shift: 0,
+    sq4Size: 50,
+    sq4Dir: 1,
+    colorPhase: 0,
+    skew: 0
+};
+
+
+const figs = {
+    sq1: {x:450,y:100,w:50,h:50},
+    sq2: {x:200,y:100,w:50,h:50},
+    sq3: {x:250,y:250,w:50,h:50},
+    sq4: {x:400,y:250,w:50,h:50},
+
+    circleLeft:  {cx:275,cy:75,r:25},
+    circleRight: {cx:425,cy:75,r:25},
+
+    bigOval: {cx:350,cy:150,rx:100,ry:50},
+    smallOval:{cx:350,cy:225,rx:75,ry:25},
+
+    capsule:{x1:300,x2:400,yTop:200,yBottom:250,r:25},
+
+    rect:{x:300,y:200,w:100,h:50}
+};
+
+
+function isInsideRect(x,y,r){
+    return x>=r.x && x<=r.x+r.w && y>=r.y && y<=r.y+r.h;
+}
+function isInsideCircle(x,y,c){
+    return (x-c.cx)**2 + (y-c.cy)**2 <= c.r*c.r;
+}
+function isInsideOval(x,y,o){
+    return ((x-o.cx)**2)/(o.rx*o.rx) + ((y-o.cy)**2)/(o.ry*o.ry) <= 1;
+}
+
+canvas.addEventListener("click", e=>{
+    const x = e.offsetX;
+    const y = e.offsetY;
+
+    if(isInsideRect(x,y,figs.sq1))
+        animations.sq1 = !animations.sq1;
+
+    if(isInsideRect(x,y,figs.sq2))
+        animations.sq2 = !animations.sq2;
+
+    if(isInsideRect(x,y,figs.sq4))
+        animations.sq4 = !animations.sq4;
+
+    if(isInsideCircle(x,y,figs.circleLeft))
+        animations.circleLeft = !animations.circleLeft;
+
+    if(isInsideCircle(x,y,figs.circleRight))
+        animations.circleRight = !animations.circleRight;
+
+    if(isInsideOval(x,y,figs.bigOval))
+        animations.bigOval = !animations.bigOval;
+});
+
+
+function drawSquare(fig, index){
+    ctx.fillStyle = "blue";
+
+    if(index === "sq1" && animations.sq1){
+        ctx.fillRect(fig.x + animState.sq1Shift, fig.y, fig.w, fig.h);
+        return;
+    }
+    if(index === "sq2" && animations.sq2){
+        ctx.fillRect(fig.x, fig.y + animState.sq2Shift, fig.w, fig.h);
+        return;
+    }
+    if(index === "sq4" && animations.sq4){
+        ctx.fillRect(fig.x, fig.y, animState.sq4Size, animState.sq4Size);
+        return;
+    }
+
+    ctx.fillRect(fig.x, fig.y, fig.w, fig.h);
+}
+
+function drawCircle(c, animateColor){
+    let color="blue";
+    if(animateColor){
+        const R=Math.floor(128+128*Math.sin(animState.colorPhase));
+        const G=Math.floor(128+128*Math.sin(animState.colorPhase+2));
+        const B=Math.floor(128+128*Math.sin(animState.colorPhase+4));
+        color=`rgb(${R},${G},${B})`;
+    }
+
+    ctx.fillStyle=color;
+    ctx.beginPath();
+    ctx.arc(c.cx,c.cy,c.r,0,Math.PI*2);
+    ctx.fill();
+}
+
+function drawOval(cx,cy,rx,ry){
+    ctx.beginPath();
+    ctx.ellipse(cx,cy,rx,ry,0,0,Math.PI*2);
+    ctx.fillStyle="blue";
+    ctx.fill();
+}
+
+function drawBigOval(){
+    if(!animations.bigOval){
+        drawOval(figs.bigOval.cx,figs.bigOval.cy,figs.bigOval.rx,figs.bigOval.ry);
+        return;
+    }
+
+    ctx.save();
+    ctx.translate(figs.bigOval.cx,figs.bigOval.cy);
+    ctx.transform(1, animState.skew, 0, 1, 0, 0);
+    drawOval(0,0,figs.bigOval.rx,figs.bigOval.ry);
+    ctx.restore();
+}
+
+function drawCapsule(){
+    ctx.beginPath();
+    ctx.moveTo(300,200);
+    ctx.lineTo(400,200);
+    ctx.arc(400,225,25,-Math.PI/2,Math.PI/2);
+    ctx.lineTo(300,250);
+    ctx.arc(300,225,25,Math.PI/2,-Math.PI/2);
+    ctx.fillStyle="blue";
+    ctx.fill();
+}
+
+function animate(){
+    if(animations.sq1){
+        animState.sq1Shift = Math.sin(Date.now()*0.003)*20;
+    }
+
+    if(animations.sq2){
+        animState.sq2Shift = Math.sin(Date.now()*0.004)*20;
+    }
+
+    if(animations.sq4){
+        animState.sq4Size += animState.sq4Dir*0.7;
+        if(animState.sq4Size > 75 || animState.sq4Size < 40)
+            animState.sq4Dir *= -1;
+    }
+
+    if(animations.circleLeft || animations.circleRight){
+        animState.colorPhase += 0.05;
+    }
+
+    if(animations.bigOval){
+        animState.skew = Math.sin(Date.now()*0.002)*0.6;
+    }
+}
+
+function draw(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+
+    drawSquare(figs.sq1,"sq1");
+    drawSquare(figs.sq2,"sq2");
+    drawSquare(figs.sq3,"sq3");
+    drawSquare(figs.sq4,"sq4");
+
+    drawCircle(figs.circleLeft, animations.circleLeft);
+    drawCircle(figs.circleRight, animations.circleRight);
+
+    drawBigOval();
+    drawOval(figs.smallOval.cx,figs.smallOval.cy,figs.smallOval.rx,figs.smallOval.ry);
+    drawCapsule();
+
+    ctx.fillStyle="blue";
+    ctx.fillRect(figs.rect.x,figs.rect.y,figs.rect.w,figs.rect.h);
+
+    animate();
+    requestAnimationFrame(draw);
+}
+
+draw();
+
+</script>
+
+</body>
+</html>
