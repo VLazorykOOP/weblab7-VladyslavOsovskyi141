@@ -1,12 +1,155 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="uk">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Content-Script-Type" content="text/javascript" >
-    <title>Lab7</title>
+<meta charset="UTF-8">
+<title>Лабораторна робота №7 — Події та JavaScript</title>
+
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        padding: 20px;
+        background: #f8f8f8;
+    }
+    h1, h2, h3, b, i {
+        cursor: pointer;
+        padding: 5px;
+        display: inline-block;
+        transition: 0.3s;
+    }
+    .block {
+        margin-top: 25px;
+        padding: 15px;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 0 5px #ccc;
+    }
+    textarea {
+        width: 100%;
+        height: 140px;
+        margin-top: 10px;
+    }
+    img {
+        width: 200px;
+        margin: 10px;
+        border-radius: 8px;
+        transition: 0.3s;
+    }
+</style>
+
+<script>
+function log(msg) {
+    console.log(msg);
+    alert(msg);
+}
+
+window.onload = () => log("onload — Сторінка повністю завантажена");
+window.onfocus = () => console.log("onfocus — Вікно активне");
+window.onblur = () => console.log("onblur — Вікно втратило фокус");
+window.onbeforeprint = () => alert("onbeforeprint — Перед друком");
+window.onafterprint = () => alert("onafterprint — Після друку");
+window.ononline = () => alert("ononline — Підключено до інтернету");
+window.onoffline = () => alert("onoffline — Втрата мережі");
+window.onresize = () => console.log("onresize — Зміна розміру вікна");
+window.onpageshow = () => console.log("onpageshow — Сторінка показана");
+window.onpagehide = () => console.log("onpagehide — Сторінку сховано");
+window.onerror = () => log("onerror — Помилка на сторінці");
+
+
+function saveVisit() {
+    let history = JSON.parse(localStorage.getItem("history") || "[]");
+    let now = new Date().toLocaleString();
+    history.push("Відвідування сторінки: " + now);
+
+    localStorage.setItem("history", JSON.stringify(history));
+    document.getElementById("historyArea").value = history.join("\n");
+}
+
+function countWords() {
+    let txt = document.getElementById("wordInput").value.trim();
+    let words = txt.match(/\b[\wА-Яа-яІіЇїЄє']+\b/g);
+    let amount = words ? words.length : 0;
+    document.getElementById("wordResult").innerText =
+        "Кількість слів: " + amount;
+}
+
+function arrayTask() {
+    let A = [-5, 12, -1, -7, 3, -2, 9];
+
+    let maxNeg = -Infinity;
+    let idx = -1;
+
+    for (let i = 0; i < A.length; i++) {
+        if (A[i] < 0 && A[i] > maxNeg) {
+            maxNeg = A[i];
+            idx = i;
+        }
+    }
+
+    document.getElementById("arrayArea").value =
+        "Масив: " + A.join(", ") +
+        "\nМаксимальний від’ємний елемент: " + maxNeg +
+        "\nЙого індекс: " + idx;
+}
+</script>
+
 </head>
+
 <body>
-    <h1> !!! Додайте свої сторінки сайту створені в лаб. роботах 1-6  </h1>
+
+<h1>Лабораторна робота №7 — Події в JavaScript</h1>
+
+<div class="block">
+    <h2 onclick="this.style.color='red'">Клік — змінюю колір</h2><br>
+
+    <h3 ondblclick="this.style.background='yellow'">
+        Подвійний клік — змінюю фон
+    </h3><br>
+
+    <b onmouseover="this.style.fontSize='28px'"
+       onmouseout="this.style.fontSize='16px'">
+       Наведи на мене (onmouseover/onmouseout)
+    </b><br><br>
+
+    <i onmousedown="this.style.color='blue'"
+       onmouseup="this.style.color='green'">
+       Натисни/відпусти мишу (mousedown/mouseup)
+    </i>
+</div>
+
+<div class="block">
+    <h2>Події миші для зображень</h2>
+
+    <img src="seisyuncomplex.jpg"
+         onmouseover="this.style.transform='scale(1.2)'"
+         onmouseout="this.style.transform='scale(1)'"
+         onclick="alert('Клік по зображенню!')" />
+
+    <img src="complex.jpg"
+         onmousedown="this.style.opacity='0.5'"
+         onmouseup="this.style.opacity='1'" />
+</div>
+
+<div class="block">
+    <h2>Завдання 3: Історія звернень до сторінки</h2>
+
+    <button onclick="saveVisit()">Run Task</button>
+    <textarea id="historyArea" placeholder="Тут з’явиться історія..."></textarea>
+</div>
+
+<div class="block">
+    <h2>Завдання 5: Порахувати кількість слів</h2>
+
+    <textarea id="wordInput" placeholder="Введіть текст..."></textarea><br>
+    <button onclick="countWords()">Пошук інформації</button>
+    <p id="wordResult"></p>
+</div>
+
+<div class="block">
+    <h2>Завдання 6: Масив — знайти найбільший від’ємний</h2>
+
+    <button onclick="arrayTask()">Array Task</button>
+    <textarea id="arrayArea" placeholder="Результат масиву..."></textarea>
+</div>
+
 </body>
 </html>
